@@ -1,0 +1,28 @@
+{
+  "name": "commutator",
+  "version": "0.1.0",
+  "type": "module",
+  "source": "src/index.ts",
+  "exports": {
+    "require": "./dist/commutator.cjs",
+    "default": "./dist/commutator.modern.js"
+  },
+  "main": "./dist/commutator.cjs",
+  "module": "./dist/commutator.module.js",
+  "unpkg": "./dist/commutator.umd.js",
+  "types": "dist/commutator.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avin/commutator"
+  },
+  "scripts": {
+    "build": "microbundle",
+    "dev": "microbundle watch"
+  },
+  "devDependencies": {
+    "microbundle": "^0.15.0"
+  },
+  "dependencies": {
+    "mitt": "3.0.0"
+  }
+}
