@@ -1,6 +1,6 @@
 {
   "name": "commutator",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "source": "src/index.ts",
   "exports": {
@@ -24,7 +24,8 @@
     "dev": "microbundle watch"
   },
   "devDependencies": {
-    "microbundle": "^0.15.0"
+    "microbundle": "^0.15.0",
+    "prettier": "^2.6.2"
   },
   "dependencies": {
     "mitt": "3.0.0"
