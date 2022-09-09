@@ -21,7 +21,8 @@
   ],
   "scripts": {
     "build": "microbundle",
-    "dev": "microbundle watch"
+    "dev": "microbundle watch",
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "microbundle": "^0.15.0",
