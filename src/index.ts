@@ -16,6 +16,7 @@ type ReqMessageObject = {
 type ResMessageObject = {
   type: 'res';
   result: any;
+  error: any;
   id: string;
 };
 
@@ -59,6 +60,13 @@ export class Commutator {
     return new Promise((resolve, reject) => {
       this.emitter.on(`res_${messageId}`, (dataObj: ResMessageObject) => {
         this.emitter.off(`res_${messageId}`);
+        if (dataObj.error) {
+          const err = new Error();
+          for (const key of Object.keys(dataObj.error)) {
+            err[key] = dataObj.error[key];
+          }
+          return reject(err);
+        }
         return resolve(dataObj.result as T);
       });
     });
@@ -67,10 +75,19 @@ export class Commutator {
   expose(funcName: string, cb: (params: any) => any) {
     this.emitter.on(`req_${funcName}`, (dataObj: ReqMessageObject) => {
       void (async () => {
-        const result = await cb(dataObj.params);
+        const { result, error } = await (async () => {
+          try {
+            const result = await cb(dataObj.params);
+            return { result, error: null };
+          } catch (err) {
+            const errObj = JSON.parse(JSON.stringify(err, Object.getOwnPropertyNames(err)));
+            return { result: null, error: errObj };
+          }
+        })();
 
         const formattedMessage = `${this.options.serviceId}::${JSON.stringify({
           result,
+          error,
           id: dataObj.id,
           type: 'res',
         })}`;
