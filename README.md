@@ -24,6 +24,20 @@ const rpc = new Commutator({
 rpc.expose('add', (data) => data.a + data.b);
 ```
 
+Destroy the instance
+```js
+rpc.destroy();
+```
+
+Remove expose handler
+```js
+const handleAdd = (data) => data.a + data.b
+// Expose
+rpc.expose('add', handleAdd);
+// Unexpose
+rpc.unexpose('add', handleAdd);
+```
+
 **iframe.js**
 
 ```js

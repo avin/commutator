@@ -23,16 +23,23 @@ type ResMessageObject = {
 export class Commutator {
   options!: CommutatorOptions;
 
+  private exposeListenersMap: Record<string, [(p:any) => any,(p:any) => any][]> = {};
+
   private emitter!: Emitter<any>;
 
   constructor(options: CommutatorOptions) {
     this.options = options;
     this.emitter = mitt();
 
-    window.addEventListener('message', this.handleMessage.bind(this), false);
+    window.addEventListener('message', this.handleMessage, false);
   }
 
-  private handleMessage(event: MessageEvent) {
+  destroy() {
+    window.removeEventListener('message', this.handleMessage, false);
+    this.emitter.all.clear();
+  }
+
+  private handleMessage = (event: MessageEvent) => {
     let data: string = event.data;
     if (data?.startsWith && data?.startsWith(`${this.options.serviceId}::`)) {
       data = data.replace(`${this.options.serviceId}::`, '');
@@ -73,7 +80,7 @@ export class Commutator {
   }
 
   expose(funcName: string, cb: (params: any) => any) {
-    this.emitter.on(`req_${funcName}`, (dataObj: ReqMessageObject) => {
+    const handler = (dataObj: ReqMessageObject) => {
       void (async () => {
         const { result, error } = await (async () => {
           try {
@@ -94,7 +101,20 @@ export class Commutator {
 
         this.options.target.postMessage(formattedMessage, this.options.origin || '*');
       })();
-    });
+    }
+    const key = `req_${funcName}`;
+    this.emitter.on(key, handler);
+    this.exposeListenersMap[key] ||= []
+    this.exposeListenersMap[key].push([cb, handler])
+  }
+
+  unexpose(funcName: string, cb: (params: any) => any) {
+    const key = `req_${funcName}`;
+    const exposeListeners =  this.exposeListenersMap[key] || []
+    const item = exposeListeners.find(i => i[0] === cb);
+    if(item){
+      this.emitter.off(key, item[1]);
+    }
   }
 
   static makeId(length = 10) {
