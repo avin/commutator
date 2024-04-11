@@ -1,11 +1,18 @@
 {
   "name": "commutator",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "type": "module",
   "source": "src/index.ts",
   "exports": {
-    "require": "./dist/index.cjs",
-    "default": "./dist/index.modern.js"
+    "require": {
+      "import": "./dist/index.modern.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "default": {
+      "import": "./dist/index.modern.js",
+      "types": "./dist/index.d.ts"
+    }
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.module.js",
